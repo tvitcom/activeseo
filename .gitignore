@@ -1,8 +1,7 @@
 ## secured files
 /info
 /data
-!/data/init.sql
-!/data/keys
+!/data/init_db.sql
 /data/bkp
 /data/LOGINS.txt
 /data/keys

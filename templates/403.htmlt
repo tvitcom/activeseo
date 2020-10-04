@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{* if .lang *}{* .lang *}{*else*}en{*end*}">
+
+{* template "_head.htmlt" . *}
+
+<body>
+
+{* template "_topmenu.htmlt" . *}
+
+<div class="container">
+
+       <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <h1 class="display-4">{* .brandname *}</h1>
+          <p class="lead">
+            Forbidden 403
+          </p>
+        </div>
+      </div>
+
+{* template "_footer.htmlt" . *}
+
+</div>
+</body>
+</html>

@@ -1,8 +1,17 @@
+# API
 
-use App\Http\Controllers\TaskController;
+FOR guests:
 
-Route::get('/', [TaskController::class,'home']);
+[v]    / GET                       - Домашняя welcome страничка сайта,
+[ ]	   /about                      - О сайте
+[v]    /403 GET                    - 403 page,
+[ ]    /auth/login GET             - login для пользователя сайта,
+[ ]    /auth/login POST            - Обработка login для пользователя сайта,
 
-Route::post('/auth', [TaskController::class,'auth']);
+[ ]   /regions/:country_id GET     - Запрос регионов только для :country_id = USA
 
-Route::get('/tasks', [TaskController::class,'tasks']);
+FOR users: /room
+
+[ ] /room/ GET                     - Seotask form
+[ ] /room/seotask POST             - Send seotask form
+[ ] /room/seotasks GET

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="{* if .lang *}{* .lang *}{*else*}en{*end*}">
+
+{* template "_head.htmlt" . *}
+
+<body>
+
+{* template "_topmenu.htmlt" . *}
+
+<div class="container">
+
+  <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Seo task setting form:</h1>
+    <p class="lead">Choose a search engine, region, language, enter a keyword</p>
+  </div>
+      
+<form id="task_form" method="post" action="/room/seotask">
+  <input type="hidden" value="3446576789079786735432" name="_csrf">
+  <div class="form-group">
+    <label for="exampleFormControlSelect1">Search engine</label>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="search_engine" id="inlineRadio1" value="google" required="on">
+      <label class="form-check-label" for="inlineRadio1">Google</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="search_engine" id="inlineRadio2" value="yandex">
+      <label class="form-check-label" for="inlineRadio2">Yandex</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="search_engine" id="inlineRadio3" value="bing">
+      <label class="form-check-label" for="inlineRadio3">Bing</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="search_engine" id="inlineRadio3" value="yahoo">
+      <label class="form-check-label" for="inlineRadio3">Yahoo</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="exampleFormControlSelect2">Country</label>
+    <select name="country_id" class="form-control" id="exampleFormControlSelect2" required="on">
+      <option value="1" selected="on">USA</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="exampleFormControlSelect2">Region</label>
+    <select name="region_id" class="form-control" id="exampleFormControlSelect2" required="on">
+      <option value="" hidden="">Выберите тип</option>
+      <option value="2840">1</option>
+      <option value="2841">2</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="exampleFormControlInput1">Keywords</label>
+    <input type="keywords" class="form-control" id="exampleFormControlInput1" placeholder="...something here..." name="keywords" required="on">
+  </div>
+  <button class="btn btn-primary">Submit task</button>
+</form>
+
+{* template "_footer.htmlt" . *}
+
+</div>
+</body>
+</html>

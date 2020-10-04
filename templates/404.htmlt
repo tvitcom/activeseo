@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="{* if .lang *}{* .lang *}{*else*}en{*end*}">
+
+{* template "_head.htmlt" . *}
+
+<body>
+
+{* template "_topmenu.htmlt" . *}
+
+<div class="container">
+
+       <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+	    <h1 class="display-4">Page coming soon...</h1>
+	    <p class="lead"><img src="/assets/img/error_404.jpg"></img></p>
+	  </div>
+
+{* template "_footer.htmlt" . *}
+
+</div>
+</body>
+</html>

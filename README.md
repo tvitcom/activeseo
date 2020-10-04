@@ -30,7 +30,7 @@ frontend: Vue / Jquery / Angular / Native JS.
 
 ### Системные требования
 
-- Golang 1.13...
+- Golang 1.14
 - Redis Database
 - PostgreSQL БД
 

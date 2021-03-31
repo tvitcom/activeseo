@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/sessions"
-	"net/http"	
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
+
 func mwIsUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
@@ -54,7 +55,7 @@ func confCORS(c *gin.Context) {
 	    script-src 'self' 'unsafe-inline' 'unsafe-eval';
 	    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;`
 	if gin.Mode() == gin.DebugMode {
-		h += `report-uri `+ APP_ENTRYPOINT +`/cspcollector;`
+		h += `report-uri ` + APP_ENTRYPOINT + `/cspcollector;`
 	}
 	c.Header("Content-Security-Policy", h)
 

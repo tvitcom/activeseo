@@ -1,9 +1,9 @@
 package main
 
-import(
+import (
 	"fmt"
-	"strings"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 //TODO : make normal getting browser lang

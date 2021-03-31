@@ -3,48 +3,49 @@ package main
 import (
 	// "encoding/json"
 	"fmt"
-	"log"
-	"os"
 	"io"
+	"log"
 	serpapi "my.localhost/funny/activeseo/services/dataforseo"
+	"os"
 	// "strings"
-	"regexp"
 	"github.com/cnjack/throttle"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"net/http"
+	"regexp"
 	// "strconv"
 	"time"
 )
 
 var (
-	KEY32                string
-	LOGS_PATH            string
-	SSLKEYS_PATH         string
-	WEBSERV_NAME         string
-	STORAGE_DRV          string
-	STORAGE_DSN          string
-	APP_ENTRYPOINT       string
-	APP_BRANDNAME        string
-	APP_FQDN             string
-	APP_FQDN_ADDITIONAL  string
-	APP_FQDN_ADDITIONAL2 string
-	APP_SSL_ENTRYPOINT   string
-	SERPAPI_LOCATIONS_URL  string
-	SERPAPI_LANGS_URL      string
-	SERPAPI_UDATA_URL      string
+	KEY32                    string
+	LOGS_PATH                string
+	SSLKEYS_PATH             string
+	WEBSERV_NAME             string
+	STORAGE_DRV              string
+	STORAGE_DSN              string
+	APP_ENTRYPOINT           string
+	APP_BRANDNAME            string
+	APP_FQDN                 string
+	APP_FQDN_ADDITIONAL      string
+	APP_FQDN_ADDITIONAL2     string
+	APP_SSL_ENTRYPOINT       string
+	SERPAPI_LOCATIONS_URL    string
+	SERPAPI_LANGS_URL        string
+	SERPAPI_UDATA_URL        string
 	SERPAPI_SETUPSEOTASK_URL string
-	SERPAPI_GETRESULT_URL  string
+	SERPAPI_GETRESULT_URL    string
 )
+
 type (
-	// PageData struct {
-	// 	Title             string
-	// 	Lang             string
-	// 	BaseUrl          string
-	// 	Data             interface{}
-	// }
+// PageData struct {
+// 	Title             string
+// 	Lang             string
+// 	BaseUrl          string
+// 	Data             interface{}
+// }
 )
 
 func init() {
@@ -67,12 +68,12 @@ func init() {
 	STORAGE_DRV = os.Getenv("db_type")
 	STORAGE_DSN = os.Getenv("db_user") + ":" + os.Getenv("db_pass") + "@tcp(" + os.Getenv("db_host") + ":" + os.Getenv("db_port") + ")/" + os.Getenv("db_name") + "?parseTime=true"
 	KEY32 = os.Getenv("app_secret_key")
-	
-	SERPAPI_LOCATIONS_URL=os.Getenv("SERPAPI_LOCATIONS_URL")
-	SERPAPI_LANGS_URL=os.Getenv("SERPAPI_LANGS_URL")
-	SERPAPI_UDATA_URL=os.Getenv("SERPAPI_UDATA_URL")
-	SERPAPI_SETUPSEOTASK_URL=os.Getenv("SERPAPI_SETUPSEOTASK_URL")
-	SERPAPI_GETRESULT_URL=os.Getenv("SERPAPI_GETRESULT_URL")
+
+	SERPAPI_LOCATIONS_URL = os.Getenv("SERPAPI_LOCATIONS_URL")
+	SERPAPI_LANGS_URL = os.Getenv("SERPAPI_LANGS_URL")
+	SERPAPI_UDATA_URL = os.Getenv("SERPAPI_UDATA_URL")
+	SERPAPI_SETUPSEOTASK_URL = os.Getenv("SERPAPI_SETUPSEOTASK_URL")
+	SERPAPI_GETRESULT_URL = os.Getenv("SERPAPI_GETRESULT_URL")
 }
 
 func main() {
@@ -146,13 +147,13 @@ func main() {
 	// 	c.String(http.StatusOK, "welcome to pubsub")
 	// })
 
-// Первая страница.
+	// Первая страница.
 	router.GET("/", func(c *gin.Context) {
 		uid, _ := getSessionCredentials(c)
 		c.HTML(http.StatusOK, "welcome.htmlt", gin.H{
-			"title":"Welcome",
-			"brandname":APP_BRANDNAME,
-			"uid":uid,
+			"title":     "Welcome",
+			"brandname": APP_BRANDNAME,
+			"uid":       uid,
 		})
 	})
 
@@ -164,31 +165,30 @@ func main() {
 	auth.GET("/login", func(c *gin.Context) {
 		uid, _ := getSessionCredentials(c)
 		c.HTML(http.StatusOK, "auth.login.htmlt", gin.H{
-			"title":"Welcome",
-			"brandname":APP_BRANDNAME,
-			"uid":uid,
+			"title":     "Welcome",
+			"brandname": APP_BRANDNAME,
+			"uid":       uid,
 		})
 	})
 
 	router.GET("/403", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "403.htmlt", gin.H{
-			"title":"Forbidden 403",
-			"brandname":APP_BRANDNAME,
+			"title":     "Forbidden 403",
+			"brandname": APP_BRANDNAME,
 		})
 	})
 
 	router.GET("/404", func(c *gin.Context) {
 		c.HTML(http.StatusNotFound, "404.htmlt", gin.H{
-			"title":"NotFound 404",
-			"brandname":APP_BRANDNAME,
+			"title":     "NotFound 404",
+			"brandname": APP_BRANDNAME,
 		})
 	})
-
 
 	auth.POST("/login", func(c *gin.Context) {
 		email := c.PostForm("email")
 		password := c.PostForm("password")
-		
+
 		//validation
 		var validEmailPattern = regexp.MustCompile(`^[_a-zA-Z0-9]{2,60}@[a-zA-Z0-9]{2,56}.[a-zA-Z]{2,6}$`)
 		if ok := validEmailPattern.MatchString(email); !ok {
@@ -200,19 +200,19 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"warn": "invalid password"})
 			return
 		}
-		
+
 		// Проверяем наличие uid в сессии
 		var uid, code, errMsg string
 		uid, _ = getSessionCredentials(c)
-		
+
 		if uid == "" {
 			creds := serpapi.ServiceSerpApiCred{
-				Login: email, 
+				Login:    email,
 				Password: password,
-			} 
-			
+			}
+
 			// Запрашиваем у серпапи инфу о пользователе
-			uid, code, errMsg = serpapi.RetrieveUserInfo(creds, SERPAPI_UDATA_URL) 
+			uid, code, errMsg = serpapi.RetrieveUserInfo(creds, SERPAPI_UDATA_URL)
 			if uid != email {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"code": code,
@@ -222,7 +222,7 @@ func main() {
 			}
 
 			DD("DEBUG:email=", email) // challenger16@rankactive.info
-			DD("DEBUG:u=", uid) // challenger16@rankactive.info
+			DD("DEBUG:u=", uid)       // challenger16@rankactive.info
 			DD("DEBUG:errmsg=", errMsg)
 			DD("DEBUG:code=", code)
 
@@ -235,21 +235,23 @@ func main() {
 		Limit:  10,
 		Within: time.Minute,
 	}))
-	
+
 	// Пользователь (авторизовавшись):
 	// - выбирает поисковую систему
 	// - выбирает регион поиска (Можете сделать регионы Соединенных Штатов Америки или на ваше усмотрение, не принципиально)
 	// - вводит ключевое слово
 	room.GET("/", func(c *gin.Context) {
 		uid, _ := getSessionCredentials(c)
-		DD("/room/ uid:",uid)
+		DD("/room/ uid:", uid)
 		c.HTML(http.StatusOK, "taskform.htmlt", gin.H{
-			"title" :"Set seotask",
-			"brandname" :APP_BRANDNAME,
-			"uid": uid,
+			"title":     "Set seotask",
+			"brandname": APP_BRANDNAME,
+			"uid":       uid,
 		})
 	})
 
+	// отправляет запрос на постановку задачи (
+	// AJAX-запросом вызывается PHP-скрипт,
 	room.POST("/seotask", func(c *gin.Context) {
 		_ = c.PostForm("_token")
 		se := c.PostForm("search_engine")
@@ -274,23 +276,17 @@ func main() {
 			return
 		}
 		var validKeywordsPattern = regexp.MustCompile(`^[\s\_\-a-zA-Z0-9]{3,64}$`)
-		DD("keywordsRaw:",keywords)
+		DD("keywordsRaw:", keywords)
 		if ok := validKeywordsPattern.MatchString(keywords); !ok {
 			c.JSON(http.StatusBadRequest, gin.H{"warn": "invalid keywords field"})
 			return
 		}
-		
-		// отправляет запрос на постановку задачи (
-		// AJAX-запросом вызывается PHP-скрипт, 
-		// который отправляет/получает данные от API-сервера:
-		// - сохраняет задачу в очередь редиса,
-		// - сохраняет ответ от постановки задачи в БД,
-		
+
 		// Проверяем наличие uid, password в сессии
 		var uid, code, errMsg string
 		uid, password := getSessionCredentials(c)
-		
-		if uid == ""  || password == "" {
+
+		if uid == "" || password == "" {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"code": code,
 				"warn": errMsg,
@@ -298,37 +294,46 @@ func main() {
 			return
 		}
 		serpapiCreds := serpapi.ServiceSerpApiCred{
-			Login: uid, 
+			Login:    uid,
 			Password: password,
-		} 
-		
-		// taskId, statusMsg, statusCode, tasksErr = serpapi.SetupSeotask(serpapiCreds, SERPAPI_UDATA_URL) 
-		_,_,tasksErr := serpapi.SetupSeotask(serpapiCreds, SERPAPI_SETUPSEOTASK_URL, se, region_id, keywords) 
+		}
+
+		// который отправляет/получает данные от API-сервера:
+		// SetupSeotask(cr ServiceSerpApiCred, url, se, locCode, keywords string)  (taskId, statusMsg, errCode string)
+		_, errMsg, tasksErr := serpapi.SetupSeotask(serpapiCreds, SERPAPI_SETUPSEOTASK_URL, se, region_id, keywords)
 		if tasksErr != "0" {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"code": code,
+			c.JSON(http.StatusInternalServerError, gin.H{
 				"warn": errMsg,
 			})
 			return
 		}
+		// - сохраняет задачу в очередь редиса,
+		redisprovider = NewRedis.UseConnect()
+		_, errMsg, tasksErr := redisprovider.SetupSeotask(serpapiCreds, SERPAPI_SETUPSEOTASK_URL, se, region_id, keywords)
+		if tasksErr != "0" {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"warn": errMsg,
+			})
+			return
+		}
+		// - сохраняет ответ от постановки задачи в БД,
 
 		c.Redirect(http.StatusMovedPermanently, "/room/tasks")
 	})
 
-
-// Вторая страница.
-// Отображение статуса поставленных задач, в задачу можна зайти и посмотреть результат.
-// [ ] /room/tasks GET
+	// Вторая страница.
+	// Отображение статуса поставленных задач, в задачу можна зайти и посмотреть результат.
+	// [ ] /room/tasks GET
 	room.GET("/tasks", func(c *gin.Context) {
 		uid, _ := getSessionCredentials(c)
-		DD("/tasks uid:",uid)
+		DD("/tasks uid:", uid)
 		c.HTML(http.StatusOK, "taskslist.htmlt", gin.H{
-			"title" :"Seotask list",
-			"brandname" :APP_BRANDNAME,
-			"uid": uid,
+			"title":     "Seotask list",
+			"brandname": APP_BRANDNAME,
+			"uid":       uid,
 		})
 	})
-	
+
 	// Start server
 	s.Addr = APP_ENTRYPOINT
 	DD("DEVELOPER SERVER MODE: without https")

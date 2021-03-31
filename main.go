@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	serpapi "my.localhost/funny/activeseo/services/dataforseo"
+	storage "my.localhost/funny/activeseo/storage"
 	"os"
 	// "strings"
 	"github.com/cnjack/throttle"
@@ -133,19 +134,6 @@ func main() {
 		}
 		DD("ContentSecurePolicy:", string(cspdata))
 	})
-
-	// router.GET("/pubsub", func(c *gin.Context) {
-	// 	redisParam := storage.NewInput{
-	// 		RedisURL: "127.0.0.1:6379",
-	// 	}
-	// 	rdPool := storage.NewPubsub(redisParam)
-	// 	_ = rdPool.Publish(key string, value string)
-
-	// 	// Subscribe subscribe
-	// 	_ = rdPool.Subscribe(key string, msg chan []byte)
-
-	// 	c.String(http.StatusOK, "welcome to pubsub")
-	// })
 
 	// Первая страница.
 	router.GET("/", func(c *gin.Context) {
@@ -300,22 +288,27 @@ func main() {
 
 		// который отправляет/получает данные от API-сервера:
 		// SetupSeotask(cr ServiceSerpApiCred, url, se, locCode, keywords string)  (taskId, statusMsg, errCode string)
-		_, errMsg, tasksErr := serpapi.SetupSeotask(serpapiCreds, SERPAPI_SETUPSEOTASK_URL, se, region_id, keywords)
+		taskId, errMsg, tasksErr := serpapi.SetupSeotask(serpapiCreds, SERPAPI_SETUPSEOTASK_URL, se, region_id, keywords)
 		if tasksErr != "0" {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"warn": errMsg,
 			})
 			return
 		}
+
+		// Prepare data to json string format
+		taskId
+
 		// - сохраняет задачу в очередь редиса,
-		redisprovider = NewRedis.UseConnect()
-		_, errMsg, tasksErr := redisprovider.SetupSeotask(serpapiCreds, SERPAPI_SETUPSEOTASK_URL, se, region_id, keywords)
-		if tasksErr != "0" {
+		redisprovider = storage.NewPubsub("127.0.0.1:6379")
+		err = redisprovider.Publish(SERPAPI_SETUPSEOTASK_URL, taskId)
+		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"warn": errMsg,
+				"warn": err,
 			})
 			return
 		}
+
 		// - сохраняет ответ от постановки задачи в БД,
 
 		c.Redirect(http.StatusMovedPermanently, "/room/tasks")
